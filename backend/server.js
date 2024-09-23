@@ -57,12 +57,7 @@ const UserSchema = new Schema({
 const User = mongoose.model("User", UserSchema);
 
 async function createUser(first_name, last_name, email, password) {
-  const user_instance = new User({
-    first_name: first_name,
-    last_name: last_name,
-    email: email,
-    password: password,
-  });
+  
 
   console.log("Checking email:", user_instance.email);
   const isAvailable = await isEmailAvailable(user_instance.email);
@@ -75,6 +70,12 @@ async function createUser(first_name, last_name, email, password) {
   }
 
   try {
+    const user_instance = new User({
+      first_name: first_name,
+      last_name: last_name,
+      email: email,
+      password: password,
+    });
     // Save the user instance to the database
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -94,6 +95,9 @@ async function isEmailAvailable(email) {
   return user === null;
 }
 
+async function isPasswordValid(password) {
+  return password.length >= 8;
+}
 app.post("/signup", async (req, res) => {
   console.log(req.body);
   const { first_name, last_name, email, password } = req.body;

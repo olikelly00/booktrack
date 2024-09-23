@@ -11,6 +11,7 @@ export default function Home() {
     password: "",
   });
 
+  const [nameInvalid, setNameInvalid] = useState(false);
   const [emailSuccessfullyAdded, setEmailSuccessfullyAdded] = useState(false);
   const [emailAlreadyExists, setEmailAlreadyExists] = useState(false);
   const [passwordLengthValid, setPasswordLengthValid] = useState(false);
@@ -24,9 +25,14 @@ export default function Home() {
   const [passwordContainsLowercase, setPasswordContainsLowercaseLetter] =
     useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === "first_name" || e.target.name === "last_name") {
+      const isValidName = await checkNamesAreInvalid(e.target.value);
+      setNameInvalid(isValidName);
+    }
   };
+
 
   const navigate = useNavigate();
 
@@ -79,6 +85,11 @@ export default function Home() {
     return regex.test(password);
   }
 
+  async function checkNamesAreInvalid(name) {
+    let regex = /^[a-zA-Z]+$/;
+    return !regex.test(name);
+  }
+
   async function checkPasswordContainsSpecial(password) {
     let regex = /^(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]/;
     console.log("EHHLO");
@@ -93,6 +104,17 @@ export default function Home() {
   async function checkPasswordLongEnough(password) {
     return password.length >= 8;
   }
+
+
+  // async function checkNameValidity(e) {
+  //   e.preventDefault();
+  //   const validName = await checkNamesAreInvalid(e.target.value);
+  //   console.log(validName)
+  //   console.log(validName)
+  //   console.log(validName)
+  //   setNameInvalid(true);
+  // }
+
 
   async function checkPasswordValidity(e) {
     e.preventDefault();
@@ -129,13 +151,14 @@ export default function Home() {
               <div className="hidden sm:mt-32 sm:flex lg:mt-16">
                 <div className="relative rounded-full py-1 px-3 text-sm leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
                   Anim aute id magna aliqua ad ad non deserunt sunt.{" "}
-                  <a
-                    href="#"
+                  <button
+                  onClick={() => console.log  ('clicked')}
+                   
                     className="whitespace-nowrap font-semibold text-indigo-600"
                   >
                     <span className="absolute inset-0" aria-hidden="true" />
                     Read more <span aria-hidden="true">&rarr;</span>
-                  </a>
+                    </button>
                 </div>
               </div>
               <h1 className="mt-24 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">
@@ -162,12 +185,12 @@ export default function Home() {
                 fugiat aliqua.
               </p>
               <div className="mt-10 flex items-center gap-x-6">
-                <a
-                  href="#signup-view"
-                  className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Get started
-                </a>
+                <button
+    onClick={() => document.getElementById('signup-view').scrollIntoView({ behavior: 'smooth' })}
+    className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+    Get started
+  </button>
+
                 <a
                   href="./signup.js"
                   className="text-base font-semibold leading-7 text-gray-900"
@@ -222,6 +245,7 @@ export default function Home() {
                       className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     />
                   </div>
+                
                 </div>
                 <div>
                   <label
@@ -242,6 +266,11 @@ export default function Home() {
                       className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     />
                   </div>
+                  {nameInvalid && (
+                    <p className="mt-2 text-error-text text-sm">
+                      Please enter a valid name (using letters A-Z) to continue.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -328,12 +357,12 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <button
-                    type="submit"
-                    className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  >
-                    Sign up
-                  </button>
+                <button
+  type="submit"
+  className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+>
+  Sign up
+</button>
                 </div>
               </form>
             </div>

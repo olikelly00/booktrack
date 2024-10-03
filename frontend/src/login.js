@@ -18,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     console.log("Form data being sent:", formData);
     //   //logic for sending login data
-    const response = await fetch("http://localhost:3000/login", {
+    const response = await fetch("http://localhost:3001/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,37 +27,16 @@ export default function Login() {
     });
     console.log(response);
     if (response.ok) {
-      console.log("User logged in successfully");
+      const data = await response.json();
+      console.log('User logged in successfully:', data);
+      localStorage.setItem('jwt', data.token);
+      localStorage.setItem('userId', data.id);
       navigate("/home");
     } else {
       console.log("Login failed");
       setInvalidCredentials(true);
     }
   }
-
-  // e.preventDefault();
-  // console.log("Form data being sent:", formData);
-  // try {
-  //   //logic for sending login data
-
-  //   // Check if the response was successful
-  //   if (response.ok) {
-  //     //navigate to user's homepage
-
-  //       } else {
-  //         // Handle server-side error, e.g., user already exists or validation errork
-  //         // const errorMessage = await response.text();
-  //         // console.error("Server error:", errorMessage);
-  //         // console.log(errorMessage)
-  //         // if (errorMessage === "Email already exists in database") {
-  //         //   setEmailAlreadyExists(true);
-  //         //   setEmailSuccessfullyAdded(false);
-  //       }
-
-  //     } catch (error) {
-  //     //   console.error("An error happened:", error); // Log any network errors
-  //     }
-  //   }
 
   return (
     <>

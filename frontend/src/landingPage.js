@@ -3,12 +3,12 @@ import { TypeAnimation } from "react-type-animation";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Home() {
+export default function LandingPage() {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     email: "",
-    password: "",
+    password: ""
   });
 
   const [nameInvalid, setNameInvalid] = useState(false);
@@ -40,7 +40,7 @@ export default function Home() {
     e.preventDefault();
     console.log("Form data being sent:", formData);
     try {
-      const response = await fetch("http://localhost:3000/signup", {
+      const response = await fetch("http://localhost:3001/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,20 +164,19 @@ export default function Home() {
               <h1 className="mt-24 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">
                 Track your<br></br>
                 <TypeAnimation
-                  sequence={[
-                    4000,
-                    "standout stories",
-                    4000,
-                    "movie marathon",
-                    4000,
-                    "beloved binge-watch",
-                    1000,
-                  ]}
-                  wrapper="span"
-                  speed={50}
-                  repeat={Infinity}
-                />{" "}
-                <br></br>with TrackIt
+  sequence={[
+    "standout stories",
+    4000,
+    "movie marathon",
+    4000,
+    "beloved binge-watch",
+    1000,
+  ]}
+  wrapper="span"
+  speed={50}
+  repeat={Infinity}
+/>{" "}
+                <br></br>with Multi<span className="text-tv-bg-color">me</span>dia
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600">
                 Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui

@@ -2,6 +2,8 @@ import { Fragment, useRef, useState, useEffect} from 'react'
 import { useNavigate } from "react-router-dom";
 import { Dialog, Transition } from '@headlessui/react'
 import './home.css';
+import { BarChart } from '@mui/x-charts/BarChart';
+
 // import { set } from 'mongoose';
 
 
@@ -84,7 +86,7 @@ export default function HomePage() {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    'Authorization': `Bearer invalids token`,
                 },
             });
     
@@ -171,9 +173,56 @@ function addNewItem() {
     setAddNewItemClicked(!addNewItemClicked);
 }
 
+async function handleLogOut() {
+    //make an API call to add the token to the blacklist
+    try {
+      const response = await fetch('http://localhost:3001/addtokentoblacklist', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+          },
+          body: JSON.stringify({
+              token: localStorage.getItem('jwt')
+          }),
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Success:', data);
+  } catch (error) {
+      console.error('Error:', error);
+  }
+  localStorage.removeItem('jwt');
+  navigate('/login');
+    
+}
 
     return (
-        <section className='media-section bg-default-bg-color'>
+        <section className='media-section h-full bg-default-bg-color'>
+        <div className="nav-bar">
+          <div className = "w-screen h-24 overflow-hidden relative">
+          <img src="/Pasted_Graphic.svg" className="w-screen opacity-50 absolute h-full w-full object-cover"></img>
+          <div className="button-container">
+          <button className="absolute right-10 top-8 z-10 button-container justify-center rounded-md border bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" onClick={() => handleLogOut()}>Log out</button>
+          </div>
+          </div>
+          
+        </div>
+        <div className="hero-section bg-red">
+          <h1 className="mt-24 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">exploreMe</h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">Check out the latest insights from your reading, binge-watching and movie marathons here</p>
+          <BarChart
+  xAxis={[{ scaleType: 'band', data: ['Books', 'Film', 'TV'] }]}
+  series={[{ data: [(filteredMedia.filter((mediaItem) => mediaItem.mediaType === 'book').length), (filteredMedia.filter((mediaItem) => mediaItem.mediaType === 'film')).length, (filteredMedia.filter((mediaItem) => mediaItem.mediaType === 'tv')).length] }]}
+  width={500}
+  height={300}
+/>
+        </div>
+
             {addNewItemClicked && (
   <AddMediaItemModal 
     setMediaItemModalVisible={setMediaItemModalVisible}
@@ -188,20 +237,23 @@ function addNewItem() {
   />
 )}
 
-            <form className="searchForm" onSubmit={handleSubmit}> 
+<div className="options-container">
+  <form className="searchForm" onSubmit={handleSubmit}> 
             <label>
                 <input 
-                className="searchBar"
+                className="searchBar button-container justify-center rounded-md border  py-2 px-4 text-sm font-medium shadow-sm focus:outline-none "
                 type="text" 
                 name="search" 
                 value={search} 
                 onChange={(event) => handleSearch(event)}
                     />
             </label>
-            <button className="submit-button" type="submit">Search</button>
+            
+              <button className="submit-button button-container justify-center rounded-md border bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" type="submit">Search</button>
             </form>
-            <button className="addNewItem-button" onClick={addNewItem}>Add new item</button>
-            <button className="adviseMe-button" onClick={() => navigate('/adviseme')}>Advise me</button>
+            <button className="addNewItem-button button-container justify-center rounded-md border bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" onClick={addNewItem}>Add new item</button>
+            <button className="adviseMe-button button-container justify-center rounded-md border bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" onClick={() => navigate('/adviseme')}>adviseMe</button>
+            </div>
             <div className="noResultsMessage">
             {noResultsFound && <p>No results found. Please try again.</p>}
             </div>
@@ -309,9 +361,11 @@ export function MediaThumbnail({ mediaItem, handleOpenModal }) {
 
 
         return (
-            <div>
-                <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                    <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+              <div className="mt-8 h-screen color-default-bg-color">              
+      
+                <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md h-screen color-bg-color">
+
+                    <div className="bg-red py-8 px-4 shadow sm:rounded-lg sm:px-10">
                     <form className="space-y-6" onSubmit={ async (event) => {
                         event.preventDefault();
                         await createMedia(newMediaItemData);

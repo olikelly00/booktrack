@@ -7,7 +7,10 @@ import logger from "morgan";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import OpenAI from "openai";
+
 import { v4 as uuidv4 } from "uuid";
+
 
 dotenv.config();
 console.log("MongoDB URI:", process.env.MONGODB_URI); // Debug print to verify URI
@@ -125,9 +128,7 @@ async function authenticateUser(email, password) {
   }
 }
 
-async function clearUserMedia() {
-  await Media.deleteMany( {userId: '66fbfe865940205a8e11fbc3'} );
-}
+
 
 app.post("/login", async (req, res) => {
   console.log(req.body);
@@ -136,46 +137,18 @@ app.post("/login", async (req, res) => {
   const userInstance = await authenticateUser(email, password);
   if (userInstance) {
     let id = userInstance._id;
-    // await clearUserMedia(id);
     const new_jwt_token = jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: 3600,
     });
     res
       .status(200)
       .send({ message: "User logged in successfully", id: id, token: new_jwt_token });
-      // seedDatabase()
   } else {
     res.status(400).send("Login failed");
   }
 });
 
-async function seedDatabase() {
-mongoose.connect('mongodb+srv://oliverkelly1995:Tr1pl3t13579@booktrackdb.2muhy.mongodb.net/?retryWrites=true&w=majority&appName=booktrackdb', { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log("MongoDB connected…")
-    })
-    .catch(err => console.log(err))
 
-    const dummyData = [
-      { title: 'The Green Mile', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'film', starRating: 5, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'Breaking Bad', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'tv', starRating: 5, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'The Shawshank Redemption', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'film', starRating: 4, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'Game of Thrones', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'tv', starRating: 4, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'Hamilton', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'theater', starRating: 5, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'The Great Gatsby', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'book', starRating: 3, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'To Kill a Mockingbird', mediaType: 'book', starRating: 4, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'The Phantom of the Opera', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'theater', starRating: 4, userId: '66fbfe865940205a8e11fbc3'},
-      { title: 'The Phantom of the Opera', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'theater', starRating: 4, userId: '66fbfe865940205a8e11fbc1'},
-      { title: 'The Phantom of the Opera', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'theater', starRating: 4, userId: '66fbfe865940205a8e11fbc2'},
-      { title: 'The Phantom of the Opera', dateAdded: '2024-10-01T21:24:42.345Z', mediaType: 'theater', starRating: 4, userId: '66fbfe865940205a8e11fbc3'},
-    ];
-Media.insertMany(dummyData)
-    .then(() => {
-        console.log('Data has been inserted');
-    })
-    .catch(error => console.log(error));
-
-  }
 const mediaSchema = new Schema({
   userId: String,
   dateAdded: Date,
@@ -196,7 +169,9 @@ app.post('/media', async (req, res) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token == null) return res.sendStatus(401); // if there isn't any token
-
+  // if (isTokenBlacklisted(token)) {
+  //   return res.sendStatus(401);
+  // }
   try {
     const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.user = user;
@@ -233,18 +208,68 @@ async function addNewMedia(media_instance) {
   }
 };
 
+// async function isTokenBlacklisted(token) {
+//   // const blacklistedToken = await BlacklistedToken.findOne({ token: token });
+//   // return blacklistedToken !== null;
+//   return false
+// };
 
-async function getMediaByUserId(userId) {
+export async function getMediaByUserId(userId) {
   const media = await Media.find({ userId: userId }).sort({ dateAdded: -1 }); 
   console.log('Media:', media);
   return media;
 }
+
+app.get('/validatetoken', async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) return res.sendStatus(401);
+
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(403);
+    }
+    console.log(user);
+    res.status(200).json(user);
+  });
+});
+
+const blackListSchema = new Schema({
+  token: String,
+});
+
+const BlacklistedToken = mongoose.model('BlacklistedToken', blackListSchema);
+
+app.post('/addtokentoblacklist', async (req, res) => {
+  const token = req.body.token;
+  console.log('Token:', token);
+  try {
+    await addToBlacklist(token);
+    res.status(200).json({ message: 'Token added successfully'});
+  } catch (error) {
+    console.error('Error adding token to blacklist:', error);
+    res.status(400).send('Error adding token to blacklist.');
+  }
+});
+
+async function addToBlacklist(token) {
+  const blacklistedToken = new BlacklistedToken({ token: token });
+  await blacklistedToken.save();
+  console.log('Token added to blacklist successfully!');
+}
+
+
 
 app.get('/media', async (req, res) => {
   const authHeader = req.headers['authorization'];
   console.log(authHeader)
   const token = authHeader && authHeader.split(' ')[1];
   if (token == null) return res.sendStatus(401);
+  // if (isTokenBlacklisted(token)) {
+  //   return res.sendStatus(403);
+  // }
   console.log(process.env.ACCESS_TOKEN_SECRET);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
     
@@ -263,6 +288,9 @@ app.delete('/media/:id', async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (token == null) return res.sendStatus(401);
+  // if (isTokenBlacklisted(token)) {
+  //   return res.sendStatus(401);
+  // }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
     if (err) {
       console.log(err);
@@ -275,3 +303,90 @@ app.delete('/media/:id', async (req, res) => {
   });
 });
 
+
+
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
+
+
+let systemPrompt = `You are an AI that recommends books, TV shows, or films based on a user's previous media items. Your style is friendly, informal, and familiar. Your target audience is young adults.
+1. Thought: Consider the user's previous media items and think about what they might like.
+2. Action: Recommend a book, TV show, or film that you think the user might like.
+3. Observation: Observe the user's reaction to your recommendation.
+`;
+
+
+export async function agent(userId, query) {
+  // Fetch user's media history from your database
+  const mediaItems = await getMediaByUserId(userId);
+
+  let messagesArray = [
+    {
+      role: "system",
+      content: systemPrompt,
+    },
+    {
+      role: "user",
+      content: `I liked ${mediaItems.join(", ")}. ${query}`,
+    },
+  ];
+
+  let userFeedback = "";
+  const MAX_ITERATIONS = 6;
+
+  for (let i = 0; i < MAX_ITERATIONS; i++) {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: messagesArray,
+    });
+    console.log(messagesArray)
+    const aiResponse = response.choices[0].message.content;
+
+
+    messagesArray.push({
+      role: "assistant",
+      content: aiResponse,
+    });
+
+    if (i === 0) {
+      userFeedback = "Can you explain why this show relates to my preferences? Please provide more specific connections to titles I've liked.";
+    } else if (i === 1) {
+      userFeedback = `I liked that, but can you suggest something less mainstream? I'd love something with a cult following.`;
+    } else if (i === 2) {
+      userFeedback = `Can you refine the recommendation to focus on books or shows with more character development?`;
+    } else {
+      userFeedback = `Now, can you summarise all of your recommendations from the messagesArray into one succinct paragraph, explain why they are recommended for this user based on the media items linked to their account? This is the only version the user will see, so make sure it covers all the points. Remember your tone is informal, friendly and casual as your audience is young adults.`;
+    }
+
+    messagesArray.push({
+      role: "user",
+      content: userFeedback,
+    });
+
+    if (userFeedback.includes("perfect")) {
+      break;
+    }
+  }
+
+  return messagesArray[messagesArray.length - 2].content;
+}
+
+
+app.post('/recommendation', async (req, res) => {
+  const userId = req.body.userId;
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required' });
+  }
+
+  try {
+    const query = getMediaByUserId(userId);
+    const recommendation = await agent(userId, query);
+    res.json({ recommendation });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to generate recommendation' });
+  }
+});

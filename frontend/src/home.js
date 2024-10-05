@@ -542,18 +542,30 @@ export function MediaItemModal({setMediaItemModalVisible, handleOpenModal, media
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div className="mediaDetailsContainer">
-                    <h1>{mediaItem.title}</h1>
-                    <p>{mediaItem.mediaType}</p>
-                    <p>{mediaItem.starRating}</p>
+                  <h1 className="mt-24 text-2xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-2xl">Here's the factfile for your {mediaItem.mediaType.toLowerCase()}<br></br>{mediaItem.title}...</h1>
+                  <br></br>
+                    <p><strong>Title</strong></p>
+                    <p>{mediaItem.title}</p>
+                    <br></br>
+                    <p><strong>What's the book about?</strong></p> 
+                    <p>{mediaItem.blurb}</p>
+                    <br></br>
+                    <p><strong>How did you rate it?</strong></p>
+                    
+                    <p>{mediaItem.starRating} stars</p>
+                    <br></br>
+                    <p><strong>Your review - what did you think?</strong></p>
                     <p>{mediaItem.review}</p>
-
-                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3 modal-button-container">
+                  
+                  
                   <button
                     type="button"
-                    className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
+                    className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                     onClick={handleCloseModal}
+                    ref={cancelButtonRef}
                   >
-                    Back
+                    Edit
                   </button>
                   <button
   type="button"
@@ -565,11 +577,10 @@ export function MediaItemModal({setMediaItemModalVisible, handleOpenModal, media
 </button>
                   <button
                     type="button"
-                    className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                    className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
                     onClick={handleCloseModal}
-                    ref={cancelButtonRef}
                   >
-                    Edit
+                    Back
                   </button>
                 </div>
                 </div>

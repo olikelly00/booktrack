@@ -16,7 +16,7 @@ dotenv.config();
 console.log("MongoDB URI:", process.env.MONGODB_URI); // Debug print to verify URI
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -220,6 +220,8 @@ export async function getMediaByUserId(userId) {
   return media;
 }
 
+
+
 app.get('/validatetoken', async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -388,5 +390,36 @@ app.post('/recommendation', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to generate recommendation' });
+  }
+});
+
+export async function updateMediaByUserId(userId, mediaId, updatedData) {
+  const updatedMedia = await Media.findOneAndUpdate({ userId, _id: mediaId }, updatedData, { new: true });
+  return updatedMedia;
+}
+
+app.put('/media/:id', async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  try {
+    const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    req.user = user;
+
+    const { id } = req.params; 
+    const updatedData = req.body; 
+
+    const updatedMedia = updateMediaByUserId(user.id, id, updatedData);
+
+    if (!updatedMedia) {
+      return res.status(404).json({ message: 'Media item not found' });
+    }
+
+    res.status(200).json(updatedMedia); 
+  } catch (error) {
+    console.error('Error updating media:', error);
+    res.status(500).json({ message: 'Error updating media' });
   }
 });

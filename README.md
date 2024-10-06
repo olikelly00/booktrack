@@ -1,4 +1,4 @@
-# Multimedia Tracker
+# Multimedia
 
 A comprehensive multimedia tracker app that helps users organize, track, and discover new content across books, films, and TV shows. This project aims to solve the frustrations associated with managing media across multiple platforms by integrating a seamless, all-in-one solution with features like personalized recommendations and social engagement.
 

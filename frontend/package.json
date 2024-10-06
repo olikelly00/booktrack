@@ -24,7 +24,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts --max_old_space_size=1024 start --host 0.0.0.0 --port $PORT",
+    "start": "serve -s build",
     "proxy": "https://multimedia-app-asah.onrender.com",
     "build": "react-scripts build",
     "test": "npx react-scripts test -- --coverage",

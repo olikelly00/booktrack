@@ -33,7 +33,7 @@ function App() {
 
 function RequireAuth({ children }) {
   const [auth, setAuth] = useState(null);
-  const url = "http://localhost:3001/validatetoken";
+  const url = "http://localhost:3000/auth/validatetoken";
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -61,7 +61,7 @@ function RequireAuth({ children }) {
   }, []);
 
   if (auth === null) {
-    return <div>Loading...</div>; // or some loading spinner
+    return <div>Loading...</div>; 
   }
 
   if (!auth) {

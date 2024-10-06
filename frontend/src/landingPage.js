@@ -40,7 +40,7 @@ export default function LandingPage() {
     e.preventDefault();
     console.log("Form data being sent:", formData);
     try {
-      const response = await fetch("http://localhost:3001/signup", {
+      const response = await fetch("http://localhost:3000/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

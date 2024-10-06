@@ -32,7 +32,7 @@ export default function Signup() {
     e.preventDefault();
     console.log("Form data being sent:", formData);
     try {
-      const response = await fetch("http://localhost:3001/signup", {
+      const response = await fetch("http://localhost:3000/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

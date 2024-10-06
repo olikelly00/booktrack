@@ -82,11 +82,12 @@ export default function HomePage() {
     const handleDelete = async (mediaItemData) => {
         console.log('deleting item:', mediaItemData);
         try {
-            const response = await fetch(`http://localhost:3001/media/${mediaItemData._id}`, {
+            const jwt = localStorage.getItem('jwt');
+            const response = await fetch(`http://localhost:3000/media/media/${mediaItemData._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer invalids token`,
+                    'Authorization': `Bearer ${jwt}`,
                 },
             });
     
@@ -127,7 +128,7 @@ export default function HomePage() {
         const fetchData = async () => {
             const jwt = localStorage.getItem('jwt');
             try {
-                const response = await fetch(`http://localhost:3001/media`, {
+                const response = await fetch(`http://localhost:3000/media/media`, {
                     headers: {
                         'Authorization': `Bearer ${jwt}`
                     }
@@ -152,7 +153,7 @@ useEffect(() => {
     const fetchData = async () => {
       const jwt = localStorage.getItem('jwt');
       try {
-        const response = await fetch(`http://localhost:3001/media`, {
+        const response = await fetch(`http://localhost:3000/media/media`, {
           headers: {
             'Authorization': `Bearer ${jwt}`
           }
@@ -176,7 +177,7 @@ function addNewItem() {
 async function handleLogOut() {
     //make an API call to add the token to the blacklist
     try {
-      const response = await fetch('http://localhost:3001/addtokentoblacklist', {
+      const response = await fetch('http://localhost:3000/auth/addtokentoblacklist', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -322,11 +323,12 @@ export function MediaThumbnail({ mediaItem, handleOpenModal }) {
     async function createMedia(newMediaItemData) {
         console.log(newMediaItemData)
         try {
-            const response = await fetch('http://localhost:3001/media', {
+            const jwt = localStorage.getItem('jwt');
+            const response = await fetch('http://localhost:3000/media/media', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    'Authorization': `Bearer ${jwt}`
                 },
                 body: JSON.stringify({
                     userId: localStorage.getItem('userId'),

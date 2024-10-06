@@ -18,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     console.log("Form data being sent:", formData);
     //   //logic for sending login data
-    const response = await fetch("http://localhost:3001/login", {
+    const response = await fetch("http://localhost:3000/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

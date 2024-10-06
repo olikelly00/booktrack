@@ -14,7 +14,7 @@ export default function AdviseMe() {
   async function handleLogOut() {
     //make an API call to add the token to the blacklist
     try {
-      const response = await fetch('http://localhost:3001/addtokentoblacklist', {
+      const response = await fetch('http://localhost:3000/addtokentoblacklist', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export default function AdviseMe() {
   async function handleRecommendationButtonClick() {
     setRecommendation(null);
     setLoading(true);
-    const response = await fetch("http://localhost:3001/recommendation", {
+    const response = await fetch("http://localhost:3000/adviseme/recommendation", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

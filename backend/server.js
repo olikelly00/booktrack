@@ -423,3 +423,6 @@ app.put('/media/:id', async (req, res) => {
     res.status(500).json({ message: 'Error updating media' });
   }
 });
+
+
+//need to add edit functionality

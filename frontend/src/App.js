@@ -20,8 +20,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<RequireAuth> <HomePage /> </RequireAuth> } />
-          <Route path="/adviseme" element={<RequireAuth> <AdviseMe /> </RequireAuth> } />
+          <Route path="/home" element={<RequireAuth> <HomePage /> </RequireAuth>} />
+          <Route path="/adviseme" element={<RequireAuth> <AdviseMe /> </RequireAuth>} />
           {/* other routes... */}
         </Routes>
       </Router>
@@ -61,11 +61,11 @@ function RequireAuth({ children }) {
   }, []);
 
   if (auth === null) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   if (!auth) {
-    return <Navigate to="/login"/>;
+    return <Navigate to="/login" />;
   }
 
   return children;
